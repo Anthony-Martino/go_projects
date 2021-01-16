@@ -12,6 +12,7 @@ import (
 	httptransport "github.com/go-kit/kit/transport/http"
 )
 
+//StringService does things to strings
 type StringService interface {
 	Uppercase(string) (string, error)
 	Count(string) int
@@ -72,7 +73,7 @@ func makeCountEndpoint(svc StringService) endpoint.Endpoint {
 	}
 }
 
-//expose service to the network JSON via HTTP
+//Transport: expose service to the network JSON via HTTP
 func main() {
 	svc := stringService{}
 
@@ -90,10 +91,11 @@ func main() {
 
 	http.Handle("/uppercase", uppercaseHandler)
 	http.Handle("/count", countHandler)
-	log.Fatal(http.ListenAndServe("8081", nil))
+	log.Fatal(http.ListenAndServe(":8081", nil))
 
 }
 
+//Decode incoming requests
 func decodeUppercaseRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var request uppercaseRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -110,6 +112,7 @@ func decodeCountRequest(_ context.Context, r *http.Request) (interface{}, error)
 	return request, nil
 }
 
+//Encode outgoing response
 func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
 	return json.NewEncoder(w).Encode(response)
 }
