@@ -24,7 +24,15 @@ func NewService(repo Repository) Service {
 	}
 }
 func (s service) Login(ctx context.Context, req LoginRequest) (string, error) {
-	return "", nil
+	user := User{
+		Email:    req.Email,
+		Password: req.Password,
+	}
+	err := s.repo.Login(ctx, user)
+	if err != nil {
+		return "error logging in", err
+	}
+	return "Success", nil
 }
 func (s service) Register(ctx context.Context, req RegisterRequest) (string, error) {
 	uuid, _ := uuid.NewV4()
