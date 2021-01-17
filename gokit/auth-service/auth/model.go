@@ -10,3 +10,13 @@ type User struct {
 	Password  string    `json:"password"`
 	LastLogin time.Time `json:"lastLogin,omitempty"`
 }
+
+//Query ...
+type Query struct {
+	Selector map[string]Selector `json:"selector"`
+}
+
+//Selector can be used in the selector field of the couch query
+type Selector struct {
+	Value interface{} `json:"$eq,omitempty"`
+}

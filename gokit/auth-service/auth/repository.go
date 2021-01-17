@@ -31,6 +31,17 @@ func (r *repository) Login(ctx context.Context, user User) error {
 }
 
 func (r *repository) Register(ctx context.Context, user User) error {
+	rows, err := r.db.Find(ctx, Query{
+		Selector: map[string]Selector{
+			"email": {
+				user.Email,
+			},
+		},
+	})
+
+	for rows.Next() {
+		return errors.New("email already in persistence")
+	}
 	pass, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
