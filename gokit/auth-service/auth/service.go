@@ -8,6 +8,7 @@ import (
 
 //Service ...
 type Service interface {
+	Login(ctx context.Context, req LoginRequest) (string, error)
 	Register(ctx context.Context, req RegisterRequest) (string, error)
 	GetUser(ctx context.Context, id string) (string, error)
 }
@@ -22,7 +23,9 @@ func NewService(repo Repository) Service {
 		repo: repo,
 	}
 }
-
+func (s service) Login(ctx context.Context, req LoginRequest) (string, error) {
+	return "", nil
+}
 func (s service) Register(ctx context.Context, req RegisterRequest) (string, error) {
 	uuid, _ := uuid.NewV4()
 	id := uuid.String()

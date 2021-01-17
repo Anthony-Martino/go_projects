@@ -9,6 +9,7 @@ import (
 
 //Repository consists of all abstract methods which interfaces with the database implementation
 type Repository interface {
+	Login(ctx context.Context, user User) error
 	Register(ctx context.Context, user User) error
 	GetUser(ctx context.Context, id string) (string, error)
 }
@@ -22,6 +23,11 @@ func NewRepository(db *kivik.DB) (Repository, error) {
 	return &repository{
 		db: db,
 	}, nil
+}
+
+func (r *repository) Login(ctx context.Context, user User) error {
+
+	return nil
 }
 
 func (r *repository) Register(ctx context.Context, user User) error {

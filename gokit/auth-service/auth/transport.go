@@ -14,12 +14,16 @@ func MakeHTTPHandler(s Service) http.Handler {
 	r := mux.NewRouter()
 	e := MakeEndpoints(s)
 
+	r.Methods("POST").Path("/login").Handler(httptransport.NewServer(
+		e.Login,
+		decodeLoginRequest,
+		encodeResponse,
+	))
 	r.Methods("POST").Path("/register").Handler(httptransport.NewServer(
 		e.Register,
 		decodeRegisterRequest,
 		encodeResponse,
 	))
-
 	r.Methods("GET").Path("/user/{id}").Handler(httptransport.NewServer(
 		e.GetUser,
 		decodeGetUserRequest,
@@ -30,6 +34,15 @@ func MakeHTTPHandler(s Service) http.Handler {
 }
 
 type (
+	//LoginRequest ...
+	LoginRequest struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+	//LoginResponse ...
+	LoginResponse struct {
+		Ok string `json:"ok"`
+	}
 	//RegisterRequest ...
 	RegisterRequest struct {
 		Name     string `json:"name"`
@@ -52,6 +65,12 @@ type (
 
 func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
 	return json.NewEncoder(w).Encode(response)
+}
+
+func decodeLoginRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	req := LoginRequest{}
+	err := json.NewDecoder(r.Body).Decode(&req)
+	return req, err
 }
 
 func decodeRegisterRequest(_ context.Context, r *http.Request) (interface{}, error) {
