@@ -2,6 +2,8 @@ package auth
 
 import (
 	"context"
+	"errors"
+	"time"
 
 	"github.com/go-kivik/kivik"
 	"golang.org/x/crypto/bcrypt"
@@ -26,8 +28,30 @@ func NewRepository(db *kivik.DB) (Repository, error) {
 }
 
 func (r *repository) Login(ctx context.Context, user User) error {
+	rows, err := r.db.Find(ctx, Query{
+		Selector: map[string]Selector{
+			"email": {
+				user.Email,
+			},
+		},
+	})
+	storedUser := User{}
+	for rows.Next() {
+		if err := rows.ScanDoc(&storedUser); err != nil {
+			return err
+		}
+	}
+	defer rows.Close()
 
-	return nil
+	errf := bcrypt.CompareHashAndPassword([]byte(storedUser.Password), []byte(user.Password))
+	if errf != nil && errf == bcrypt.ErrMismatchedHashAndPassword { //Password does not match!
+		return errors.New("invalid login credentials, please try again")
+	}
+
+	storedUser.LastLogin = time.Now()
+	_, err = r.db.Put(ctx, storedUser.ID, storedUser)
+
+	return err
 }
 
 func (r *repository) Register(ctx context.Context, user User) error {
