@@ -27,14 +27,14 @@ func NewLoggingMiddleware(logger log.Logger) LoggingMiddleware {
 
 func (mw loggingMiddleware) Login(ctx context.Context, req LoginRequest) (resp string, err error) {
 	defer func(begin time.Time) {
-		mw.logger.Log("method", "Login", "request", req, "took", time.Since(begin), "err", err)
+		mw.logger.Log("method", "Login", "request", "LoginRequest", "took", time.Since(begin), "err", err)
 	}(time.Now())
 	return mw.next.Login(ctx, req)
 }
 
 func (mw loggingMiddleware) Register(ctx context.Context, req RegisterRequest) (resp string, err error) {
 	defer func(begin time.Time) {
-		mw.logger.Log("method", "Register", "request", req, "took", time.Since(begin), "err", err)
+		mw.logger.Log("method", "Register", "request", "RegisterRequest", "took", time.Since(begin), "err", err)
 	}(time.Now())
 	return mw.next.Register(ctx, req)
 }

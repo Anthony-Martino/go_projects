@@ -9,6 +9,7 @@ type User struct {
 	Email     string    `json:"email"`
 	Password  string    `json:"password"`
 	LastLogin time.Time `json:"lastLogin,omitempty"`
+	Rev       string    `json:"_rev,omitempty"`
 }
 
 //Query ...
