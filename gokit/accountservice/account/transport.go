@@ -3,23 +3,20 @@ package account
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"net/http"
 
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
 )
 
-var errInvalidRequest = errors.New("invalid request")
-
 //MakeHTTPHandler mounts all of the service endpoints into a http.Handler
 func MakeHTTPHandler(s Service) http.Handler {
 	r := mux.NewRouter()
 	e := MakeEndpoints(s)
 
-	r.Methods("POST").Path("/user").Handler(httptransport.NewServer(
-		e.CreateUser,
-		decodeCreateUserRequest,
+	r.Methods("POST").Path("/register").Handler(httptransport.NewServer(
+		e.Register,
+		decodeRegisterRequest,
 		encodeResponse,
 	))
 
@@ -33,13 +30,14 @@ func MakeHTTPHandler(s Service) http.Handler {
 }
 
 type (
-	//CreateUserRequest ...
-	CreateUserRequest struct {
+	//RegisterRequest ...
+	RegisterRequest struct {
+		Name     string `json:"name"`
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
-	//CreateUserResponse ...
-	CreateUserResponse struct {
+	//RegisterResponse ...
+	RegisterResponse struct {
 		Ok string `json:"ok"`
 	}
 	// GetUserRequest ...
@@ -56,8 +54,8 @@ func encodeResponse(_ context.Context, w http.ResponseWriter, response interface
 	return json.NewEncoder(w).Encode(response)
 }
 
-func decodeCreateUserRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	req := CreateUserRequest{}
+func decodeRegisterRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	req := RegisterRequest{}
 	err := json.NewDecoder(r.Body).Decode(&req)
 	return req, err
 }

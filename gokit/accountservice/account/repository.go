@@ -4,11 +4,12 @@ import (
 	"context"
 
 	"github.com/go-kivik/kivik"
+	"golang.org/x/crypto/bcrypt"
 )
 
 //Repository consists of all abstract methods which interfaces with the database implementation
 type Repository interface {
-	CreateUser(ctx context.Context, user User) error
+	Register(ctx context.Context, user User) error
 	GetUser(ctx context.Context, id string) (string, error)
 }
 
@@ -23,8 +24,14 @@ func NewRepository(db *kivik.DB) (Repository, error) {
 	}, nil
 }
 
-func (r *repository) CreateUser(ctx context.Context, user User) error {
-	_, err := r.db.Put(ctx, user.ID, user)
+func (r *repository) Register(ctx context.Context, user User) error {
+	pass, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	user.Password = string(pass)
+	_, err = r.db.Put(ctx, user.ID, user)
 	return err
 }
 

@@ -25,11 +25,11 @@ func NewLoggingMiddleware(logger log.Logger) LoggingMiddleware {
 	}
 }
 
-func (mw loggingMiddleware) CreateUser(ctx context.Context, email string, password string) (resp string, err error) {
+func (mw loggingMiddleware) Register(ctx context.Context, req RegisterRequest) (resp string, err error) {
 	defer func(begin time.Time) {
-		mw.logger.Log("method", "CreateUser", "email", email, "took", time.Since(begin), "err", err)
+		mw.logger.Log("method", "Register", "request", req, "took", time.Since(begin), "err", err)
 	}(time.Now())
-	return mw.next.CreateUser(ctx, email, password)
+	return mw.next.Register(ctx, req)
 }
 
 func (mw loggingMiddleware) GetUser(ctx context.Context, id string) (resp string, err error) {

@@ -8,7 +8,7 @@ import (
 
 //Service ...
 type Service interface {
-	CreateUser(ctx context.Context, email string, password string) (string, error)
+	Register(ctx context.Context, req RegisterRequest) (string, error)
 	GetUser(ctx context.Context, id string) (string, error)
 }
 
@@ -23,17 +23,18 @@ func NewService(repo Repository) Service {
 	}
 }
 
-func (s service) CreateUser(ctx context.Context, email string, password string) (string, error) {
+func (s service) Register(ctx context.Context, req RegisterRequest) (string, error) {
 	uuid, _ := uuid.NewV4()
 	id := uuid.String()
 
 	user := User{
 		ID:       id,
-		Email:    email,
-		Password: password,
+		Name:     req.Name,
+		Email:    req.Email,
+		Password: req.Password,
 	}
 
-	err := s.repo.CreateUser(ctx, user)
+	err := s.repo.Register(ctx, user)
 	if err != nil {
 		return "failed to create user", err
 	}
