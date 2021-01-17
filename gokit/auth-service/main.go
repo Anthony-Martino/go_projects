@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
-	"github.com/go_projects/accountservice/account"
+	"github.com/go_projects/auth-service/auth"
 )
 
 func main() {
@@ -26,7 +26,7 @@ func main() {
 		logger = log.NewLogfmtLogger(os.Stdout)
 		logger = log.NewSyncLogger(logger)
 		logger = log.With(logger,
-			"service", "account",
+			"service", "auth",
 			"time:", log.DefaultTimestampUTC,
 			"caller", log.DefaultCaller,
 		)
@@ -35,16 +35,16 @@ func main() {
 	level.Info(logger).Log("msg", "service started")
 	defer level.Info(logger).Log("msg", "service ended")
 
-	db, err := account.InitDB(*dbName, *dbType)
+	db, err := auth.InitDB(*dbName, *dbType)
 	if err != nil {
 		logger.Log("Error connecting to database, %s", err)
 	}
-	repo, _ := account.NewRepository(db)
+	repo, _ := auth.NewRepository(db)
 
-	var s account.Service
+	var s auth.Service
 	{
-		s = account.NewService(repo)
-		s = account.NewLoggingMiddleware(logger)(s)
+		s = auth.NewService(repo)
+		s = auth.NewLoggingMiddleware(logger)(s)
 	}
 
 	errs := make(chan error)
@@ -57,7 +57,7 @@ func main() {
 
 	go func() {
 		logger.Log("listening on port", *httpPort)
-		h := account.MakeHTTPHandler(s)
+		h := auth.MakeHTTPHandler(s)
 		errs <- http.ListenAndServe(*httpPort, h)
 	}()
 

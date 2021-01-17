@@ -1,4 +1,4 @@
-module github.com/go_projects/accountservice
+module github.com/go_projects/auth-service
 
 go 1.15
 
