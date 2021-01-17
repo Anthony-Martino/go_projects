@@ -17,13 +17,13 @@ func MakeHTTPHandler(s Service) http.Handler {
 	r := mux.NewRouter()
 	e := MakeEndpoints(s)
 
-	r.Methods("POST").Path("/createuser").Handler(httptransport.NewServer(
+	r.Methods("POST").Path("/user").Handler(httptransport.NewServer(
 		e.CreateUser,
 		decodeCreateUserRequest,
 		encodeResponse,
 	))
 
-	r.Methods("GET").Path("/getuser").Handler(httptransport.NewServer(
+	r.Methods("GET").Path("/user/{id}").Handler(httptransport.NewServer(
 		e.GetUser,
 		decodeGetUserRequest,
 		encodeResponse,
@@ -63,9 +63,10 @@ func decodeCreateUserRequest(_ context.Context, r *http.Request) (interface{}, e
 }
 
 func decodeGetUserRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	req := GetUserRequest{ID: r.URL.Query().Get("id")}
-	if req.ID == "" {
-		return nil, errInvalidRequest
+	vars := mux.Vars(r)
+
+	req := GetUserRequest{
+		ID: vars["id"],
 	}
 	return req, nil
 }
