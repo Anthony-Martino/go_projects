@@ -38,7 +38,7 @@ func (r *repository) Login(ctx context.Context, user User) error {
 	storedUser := User{}
 	for rows.Next() {
 		if err := rows.ScanDoc(&storedUser); err != nil {
-			return err
+			return errors.New("invalid login credentials, please try again")
 		}
 	}
 	defer rows.Close()
@@ -72,6 +72,7 @@ func (r *repository) Register(ctx context.Context, user User) error {
 	}
 
 	user.Password = string(pass)
+	user.CreatedDate = time.Now()
 	_, err = r.db.Put(ctx, user.ID, user)
 	return err
 }
