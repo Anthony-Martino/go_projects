@@ -35,21 +35,21 @@ func (r *repository) Login(ctx context.Context, user User) error {
 			},
 		},
 	})
-	storedUser := User{}
+	dbUser := User{}
 	for rows.Next() {
-		if err := rows.ScanDoc(&storedUser); err != nil {
+		if err := rows.ScanDoc(&dbUser); err != nil {
 			return errors.New("invalid login credentials, please try again")
 		}
 	}
 	defer rows.Close()
 
-	errf := bcrypt.CompareHashAndPassword([]byte(storedUser.Password), []byte(user.Password))
+	errf := bcrypt.CompareHashAndPassword([]byte(dbUser.Password), []byte(user.Password))
 	if errf != nil && errf == bcrypt.ErrMismatchedHashAndPassword { //Password does not match!
 		return errors.New("invalid login credentials, please try again")
 	}
 
-	storedUser.LastLogin = time.Now()
-	_, err = r.db.Put(ctx, storedUser.ID, storedUser)
+	dbUser.LastLogin = time.Now()
+	_, err = r.db.Put(ctx, dbUser.ID, dbUser)
 
 	return err
 }
@@ -64,7 +64,7 @@ func (r *repository) Register(ctx context.Context, user User) error {
 	})
 
 	for rows.Next() {
-		return errors.New("email already in persistence")
+		return errors.New("error creating an account") //generic error message incase of malicious registration attempts
 	}
 	pass, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
@@ -85,3 +85,13 @@ func (r *repository) GetUser(ctx context.Context, id string) (string, error) {
 	}
 	return user.Email, nil
 }
+
+// func (r *repository) findRowsFromField(field string) (*Rows, error) {
+// 	return r.db.Find(ctx, Query{
+// 		Selector: map[string]Selector{
+// 			"email": {
+// 				user.Email,
+// 			},
+// 		},
+// 	})
+// }

@@ -24,6 +24,11 @@ func MakeHTTPHandler(s Service) http.Handler {
 		decodeRegisterRequest,
 		encodeResponse,
 	))
+	r.Methods("POST").Path("/token").Handler(httptransport.NewServer(
+		e.Token,
+		decodeTokenRequest,
+		encodeResponse,
+	))
 	r.Methods("GET").Path("/user/{id}").Handler(httptransport.NewServer(
 		e.GetUser,
 		decodeGetUserRequest,
@@ -53,6 +58,16 @@ type (
 	RegisterResponse struct {
 		Ok string `json:"ok"`
 	}
+	//TokenRequest ...
+	TokenRequest struct {
+		ID      string `json:"id"`
+		Subject string `json:"subject"`
+		Secret  string `json:"secret"`
+	}
+	//TokenResponse ...
+	TokenResponse struct {
+		Token string `json:"token,omitempty"`
+	}
 	// GetUserRequest ...
 	GetUserRequest struct {
 		ID string `json:"id"`
@@ -75,6 +90,12 @@ func decodeLoginRequest(_ context.Context, r *http.Request) (interface{}, error)
 
 func decodeRegisterRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	req := RegisterRequest{}
+	err := json.NewDecoder(r.Body).Decode(&req)
+	return req, err
+}
+
+func decodeTokenRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	req := TokenRequest{}
 	err := json.NewDecoder(r.Body).Decode(&req)
 	return req, err
 }

@@ -11,6 +11,7 @@ import (
 type Endpoints struct {
 	Login    endpoint.Endpoint
 	Register endpoint.Endpoint
+	Token    endpoint.Endpoint
 	GetUser  endpoint.Endpoint
 }
 
@@ -19,6 +20,7 @@ func MakeEndpoints(s Service) Endpoints {
 	return Endpoints{
 		Login:    makeLoginEndpoint(s),
 		Register: makeRegisterEndpoint(s),
+		Token:    makeTokenEndpoint(s),
 		GetUser:  makeGetUserEndpoint(s),
 	}
 }
@@ -42,6 +44,17 @@ func makeRegisterEndpoint(s Service) endpoint.Endpoint {
 		}
 
 		return s.Register(ctx, req)
+	}
+}
+
+func makeTokenEndpoint(s Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req, ok := request.(TokenRequest)
+		if !ok {
+			return nil, errors.New("Request is not of type TokenRequest")
+		}
+
+		return s.Token(ctx, req)
 	}
 }
 
