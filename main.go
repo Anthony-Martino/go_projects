@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
-	"github.com/go_projects/auth-service/auth"
+	"github.com/go_projects/gokit-service/auth"
 )
 
 func main() {

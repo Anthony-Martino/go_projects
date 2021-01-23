@@ -1,4 +1,4 @@
-module github.com/go_projects/auth-service
+module github.com/go_projects/gokit-service
 
 go 1.15
 
